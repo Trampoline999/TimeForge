@@ -1,0 +1,329 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  DEPARTMENT_ADMIN
+  FACULTY
+  STUDENT
+}
+
+enum SubjectType {
+  THEORY
+  LAB
+  PRACTICAL
+  TUTORIAL
+  PROJECT
+}
+
+enum RoomType {
+  CLASSROOM
+  COMPUTER_LAB
+  ELECTRONICS_LAB
+  MECHANICAL_LAB
+  CIVIL_LAB
+  SEMINAR_HALL
+  WORKSHOP
+  OTHER
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+enum TimetableStatus {
+  DRAFT
+  GENERATED
+  UNDER_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AcademicYearStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum ConflictSeverity {
+  HARD
+  SOFT
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  name         String
+  role         Role        @default(STUDENT)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  facultyId    String?     @unique
+  faculty      Faculty?    @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Department {
+  id          String       @id @default(uuid())
+  name        String
+  code        String       @unique
+  description String?
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  divisions   Division[]
+  subjects    Subject[]
+  faculty     Faculty[]
+  rooms       Room[]
+  users       User[]
+  timetables  Timetable[]
+
+  @@map("departments")
+}
+
+model AcademicYear {
+  id         String             @id @default(uuid())
+  name       String             @unique // e.g., "2026-27"
+  startDate  DateTime
+  endDate    DateTime
+  status     AcademicYearStatus @default(ACTIVE)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  semesters  Semester[]
+  timetables Timetable[]
+
+  @@map("academic_years")
+}
+
+model Semester {
+  id             String       @id @default(uuid())
+  number         Int          // 1 to 8
+  name           String       // "Semester 5"
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  divisions      Division[]
+  subjects       Subject[]
+  timetables     Timetable[]
+
+  @@unique([academicYearId, number])
+  @@map("semesters")
+}
+
+model Division {
+  id             String                 @id @default(uuid())
+  name           String                 // e.g. "CSE-A"
+  departmentId   String
+  department     Department             @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  semesterId     String
+  semester       Semester               @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  studentCount   Int                    @default(60)
+  active         Boolean                @default(true)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  availability   DivisionAvailability[]
+  timetableEntries TimetableEntry[]
+
+  @@unique([departmentId, semesterId, name])
+  @@map("divisions")
+}
+
+model Subject {
+  id                  String             @id @default(uuid())
+  name                String             // e.g. "Database Management Systems"
+  code                String             // e.g. "CS501"
+  departmentId        String
+  department          Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  semesterId          String
+  semester            Semester           @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  type                SubjectType        @default(THEORY)
+  weeklySessions      Int                @default(3) // required sessions per week
+  duration            Int                @default(1) // in periods (e.g. 1 for theory, 2 for lab)
+  requiredRoomType    RoomType           @default(CLASSROOM)
+  capacityRequirement Int?
+  color               String?            @default("#3b82f6") // visual identifier
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  facultySubjects     FacultySubject[]
+  timetableEntries    TimetableEntry[]
+
+  @@unique([departmentId, semesterId, code])
+  @@map("subjects")
+}
+
+model Faculty {
+  id              String                @id @default(uuid())
+  name            String                // e.g. "Prof. Rahul Sharma"
+  employeeCode    String                @unique
+  email           String                @unique
+  departmentId    String
+  department      Department            @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  designation     String                @default("Assistant Professor")
+  active          Boolean               @default(true)
+  maxWeeklyLoad   Int                   @default(18) // maximum periods per week
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  facultySubjects FacultySubject[]
+  availability    FacultyAvailability[]
+  timetableEntries TimetableEntry[]
+  user            User?
+
+  @@map("faculty")
+}
+
+model FacultySubject {
+  id        String   @id @default(uuid())
+  facultyId String
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([facultyId, subjectId])
+  @@map("faculty_subjects")
+}
+
+model Room {
+  id               String           @id @default(uuid())
+  roomNumber       String           // e.g. "203" or "Lab-1"
+  building         String           // e.g. "Main Academic Block"
+  capacity         Int              @default(70)
+  roomType         RoomType         @default(CLASSROOM)
+  departmentId     String?          // null if shared across college
+  department       Department?      @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  isShared         Boolean          @default(false)
+  active           Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  timetableEntries TimetableEntry[]
+
+  @@unique([building, roomNumber])
+  @@map("rooms")
+}
+
+model TimeSlot {
+  id                   String                 @id @default(uuid())
+  day                  DayOfWeek
+  periodNumber         Int                    // 1 to 7
+  startTime            String                 // "09:00"
+  endTime              String                 // "10:00"
+  isBreak              Boolean                @default(false)
+  active               Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  facultyAvailability  FacultyAvailability[]
+  divisionAvailability DivisionAvailability[]
+  timetableEntries     TimetableEntry[]
+
+  @@unique([day, periodNumber])
+  @@map("time_slots")
+}
+
+model FacultyAvailability {
+  id         String   @id @default(uuid())
+  facultyId  String
+  faculty    Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  timeSlotId String
+  timeSlot   TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  isAvailable Boolean  @default(true)
+  isPreferred Boolean  @default(false)
+
+  @@unique([facultyId, timeSlotId])
+  @@map("faculty_availability")
+}
+
+model DivisionAvailability {
+  id          String   @id @default(uuid())
+  divisionId  String
+  division    Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  timeSlotId  String
+  timeSlot    TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  isAvailable Boolean  @default(true)
+
+  @@unique([divisionId, timeSlotId])
+  @@map("division_availability")
+}
+
+model Timetable {
+  id             String           @id @default(uuid())
+  name           String           // e.g. "Odd Semester 2026-27 - CSE, IT, ME"
+  academicYearId String
+  academicYear   AcademicYear     @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  semesterId     String?
+  semester       Semester?        @relation(fields: [semesterId], references: [id], onDelete: SetNull)
+  departmentId   String?
+  department     Department?      @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  version        Int              @default(1)
+  status         TimetableStatus  @default(DRAFT)
+  metadata       Json?            // generation stats, department list, fitness score
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  entries        TimetableEntry[]
+  conflicts      Conflict[]
+
+  @@map("timetables")
+}
+
+model TimetableEntry {
+  id           String    @id @default(uuid())
+  timetableId  String
+  timetable    Timetable @relation(fields: [timetableId], references: [id], onDelete: Cascade)
+  divisionId   String
+  division     Division  @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  facultyId    String
+  faculty      Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  roomId       String
+  room         Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  timeSlotId   String
+  timeSlot     TimeSlot  @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  duration     Int       @default(1) // 1 for single period, 2 for double/lab
+  sessionGroup String?   // links consecutive slots together e.g. "lab-uuid"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([timetableId, divisionId, timeSlotId])
+  @@map("timetable_entries")
+}
+
+model Conflict {
+  id                 String           @id @default(uuid())
+  timetableId        String
+  timetable          Timetable        @relation(fields: [timetableId], references: [id], onDelete: Cascade)
+  type               String           // FACULTY_CONFLICT, ROOM_CONFLICT, etc.
+  severity           ConflictSeverity @default(HARD)
+  description        String
+  affectedResources  Json?            // { facultyId, divisionId, roomId, timeSlotId, etc. }
+  suggestedResolution String?
+  createdAt          DateTime         @default(now())
+
+  @@map("conflicts")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // GENERATE_TIMETABLE, MOVE_ENTRY, PUBLISH_TIMETABLE, etc.
+  entity    String   // Timetable, Faculty, Subject
+  entityId  String?
+  details   Json?
+  timestamp DateTime @default(now())
+
+  @@map("audit_logs")
+}
