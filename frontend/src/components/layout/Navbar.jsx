@@ -78,53 +78,50 @@ export default function Navbar() {
   const getRoleBadge = (role) => {
     switch (role) {
       case 'SUPER_ADMIN':
-        return <Badge variant="destructive" className="font-medium text-[10px]">Super Admin</Badge>;
+        return <Badge variant="secondary" className="font-medium text-[11px] text-primary bg-primary/10 border-0">Admin</Badge>;
       case 'DEPARTMENT_ADMIN':
-        return <Badge variant="warning" className="font-medium text-[10px]">HOD / Dept Admin</Badge>;
+        return <Badge variant="secondary" className="font-medium text-[11px] text-amber-600 dark:text-amber-400 bg-amber-500/10 border-0">HOD</Badge>;
       case 'FACULTY':
-        return <Badge variant="purple" className="font-medium text-[10px]">Faculty</Badge>;
+        return <Badge variant="secondary" className="font-medium text-[11px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-0">Faculty</Badge>;
       case 'STUDENT':
-        return <Badge variant="success" className="font-medium text-[10px]">Student (Read-only)</Badge>;
+        return <Badge variant="secondary" className="font-medium text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-0">Student</Badge>;
       default:
         return null;
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-[1560px] items-center justify-between px-4 sm:px-6">
         
-        {/* Logo and Brand */}
+        {/* Minimal Clean Logo */}
         <div 
-          className="flex items-center gap-3 cursor-pointer group select-none" 
+          className="flex items-center gap-2.5 cursor-pointer group select-none" 
           onClick={() => setActiveTab('dashboard')}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
-            <GraduationCap className="h-5 w-5" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm group-hover:opacity-90 transition-opacity">
+            <GraduationCap className="h-4 w-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-heading text-base font-bold tracking-tight text-foreground">
-                TimeForge<span className="text-primary font-bold">.ai</span>
-              </span>
-              <Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4 font-mono font-normal">
-                ACADEMIC
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground hidden sm:block">Intelligent Academic Scheduling Engine</p>
+          <div className="flex items-center gap-2">
+            <span className="font-heading text-sm font-semibold tracking-tight text-foreground">
+              TimeForge
+            </span>
+            <span className="text-[11px] text-muted-foreground/80 font-normal hidden sm:inline">
+              / Timetable
+            </span>
           </div>
         </div>
 
         {/* Right Actions: Generator Trigger, Theme Toggle & User / Role Switcher */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-2">
           {currentUser && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'DEPARTMENT_ADMIN') && (
             <Button
               onClick={() => setActiveTab('generator')}
               size="sm"
-              className="gap-1.5 font-medium shadow-sm"
+              className="gap-1.5 h-8 text-xs font-medium shadow-none"
             >
               <Sparkles className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Generate Timetable</span>
+              <span className="hidden sm:inline">New Timetable</span>
             </Button>
           )}
 
@@ -134,21 +131,21 @@ export default function Navbar() {
           {/* User Role Switcher Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-9 px-2.5">
+              <Button variant="ghost" size="sm" className="gap-2 h-8 px-2 hover:bg-accent/60">
                 <Avatar className="h-6 w-6">
                   <AvatarFallback className="text-[11px] font-semibold bg-muted text-foreground">
                     {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden md:block">
-                  <span className="text-xs font-medium leading-none block">{currentUser?.name || 'Guest User'}</span>
+                  <span className="text-xs font-medium leading-none block">{currentUser?.name || 'Guest'}</span>
                 </div>
                 {currentUser && (
                   <span className="hidden lg:inline-block">
                     {getRoleBadge(currentUser.role)}
                   </span>
                 )}
-                <ChevronDown className="h-3.5 w-3.5 opacity-60 ml-0.5" />
+                <ChevronDown className="h-3 w-3 opacity-50 ml-0.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">

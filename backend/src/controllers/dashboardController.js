@@ -29,7 +29,7 @@ export async function getDashboardStats(req, res) {
       prisma.auditLog.findMany({
         orderBy: { timestamp: 'desc' },
         take: 8,
-      }),
+      })
     ]);
 
     const activeAcademicYear = await prisma.academicYear.findFirst({

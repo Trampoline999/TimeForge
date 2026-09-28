@@ -97,6 +97,7 @@ export async function generateCollegeTimetable({
     },
   });
 
+  
   // 6. Build fast lookup maps
   const facultyAvailabilityMap = new Map();
   for (const f of faculty) {

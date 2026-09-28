@@ -227,32 +227,32 @@ export default function TimetablesView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       
       {/* Header and Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-border/60">
         <div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {currentTimetable?.name || 'Academic Timetable Matrix'}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              {currentTimetable?.name || 'Timetable Matrix'}
             </h1>
             {currentTimetable && (
               <Badge
-                variant={
+                variant="secondary"
+                className={`text-[10px] h-5 px-2 font-normal border-0 ${
                   currentTimetable.status === 'PUBLISHED'
-                    ? 'success'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                     : currentTimetable.status === 'ARCHIVED'
-                    ? 'secondary'
-                    : 'info'
-                }
-                className="font-medium"
+                    ? 'bg-muted text-muted-foreground'
+                    : 'bg-primary/10 text-primary'
+                }`}
               >
                 {currentTimetable.status}
               </Badge>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Academic Year {currentTimetable?.academicYear?.name || '2026-27'} • {filteredEntries.length} sessions scheduled
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {currentTimetable?.academicYear?.name || '2026-27'} • {filteredEntries.length} sessions scheduled in this view
           </p>
         </div>
 
@@ -262,10 +262,10 @@ export default function TimetablesView() {
             <Button
               onClick={handlePublish}
               size="sm"
-              className="gap-1.5 shadow-sm"
+              className="h-8 text-xs font-medium gap-1.5 shadow-none"
             >
-              <CheckCircle2 className="h-4 w-4" />
-              <span>Publish Timetable</span>
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Publish</span>
             </Button>
           )}
 
@@ -274,7 +274,7 @@ export default function TimetablesView() {
               variant="outline"
               size="sm"
               onClick={handleArchive}
-              className="gap-1.5"
+              className="h-8 text-xs font-medium gap-1.5 shadow-none"
             >
               <Archive className="h-3.5 w-3.5 text-muted-foreground" />
               <span>Archive</span>
@@ -285,7 +285,7 @@ export default function TimetablesView() {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="gap-1.5"
+            className="h-8 text-xs font-medium gap-1.5 shadow-none"
           >
             <Download className="h-3.5 w-3.5 text-muted-foreground" />
             <span>Export CSV</span>
@@ -295,7 +295,7 @@ export default function TimetablesView() {
             variant="outline"
             size="sm"
             onClick={() => window.print()}
-            className="gap-1.5"
+            className="h-8 text-xs font-medium gap-1.5 shadow-none"
           >
             <Printer className="h-3.5 w-3.5 text-muted-foreground" />
             <span>Print</span>
@@ -304,104 +304,102 @@ export default function TimetablesView() {
       </div>
 
       {/* Filter and View Mode Switcher Card */}
-      <Card>
-        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          {/* View Mode Tabs */}
-          <Tabs value={viewMode} onValueChange={setViewMode} className="w-auto">
-            <TabsList className="grid grid-cols-3 w-full sm:w-[380px]">
-              <TabsTrigger value="DIVISION" className="gap-1.5 text-xs">
-                <Layers className="h-3.5 w-3.5" />
-                <span>Division</span>
-              </TabsTrigger>
-              <TabsTrigger value="FACULTY" className="gap-1.5 text-xs">
-                <User className="h-3.5 w-3.5" />
-                <span>Faculty</span>
-              </TabsTrigger>
-              <TabsTrigger value="ROOM" className="gap-1.5 text-xs">
-                <DoorOpen className="h-3.5 w-3.5" />
-                <span>Room</span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-2.5 rounded-lg border border-border/80 bg-card">
+        
+        {/* View Mode Tabs */}
+        <Tabs value={viewMode} onValueChange={setViewMode} className="w-auto">
+          <TabsList className="h-8 p-0.5 bg-muted/60">
+            <TabsTrigger value="DIVISION" className="h-7 text-xs px-3 gap-1.5">
+              <Layers className="h-3.5 w-3.5" />
+              <span>Division</span>
+            </TabsTrigger>
+            <TabsTrigger value="FACULTY" className="h-7 text-xs px-3 gap-1.5">
+              <User className="h-3.5 w-3.5" />
+              <span>Faculty</span>
+            </TabsTrigger>
+            <TabsTrigger value="ROOM" className="h-7 text-xs px-3 gap-1.5">
+              <DoorOpen className="h-3.5 w-3.5" />
+              <span>Room</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-          {/* Entity Selector (Divisions, Faculty, Rooms) & Timetable Select */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Select {viewMode.toLowerCase()}:</span>
+        {/* Entity Selector (Divisions, Faculty, Rooms) & Timetable Select */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">Viewing:</span>
+            <select
+              value={selectedEntityId}
+              onChange={(e) => setSelectedEntityId(e.target.value)}
+              className="h-8 rounded-md border border-input bg-background px-2.5 py-0 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {viewMode === 'DIVISION' && divisions.map(d => (
+                <option key={d.id} value={d.id}>{d.name} ({d.department?.code || 'Dept'} • {d.studentCount} students)</option>
+              ))}
+
+              {viewMode === 'FACULTY' && facultyList.map(f => (
+                <option key={f.id} value={f.id}>{f.name} ({f.department?.code})</option>
+              ))}
+
+              {viewMode === 'ROOM' && roomsList.map(r => (
+                <option key={r.id} value={r.id}>{r.roomNumber} ({r.roomType} • Cap {r.capacity})</option>
+              ))}
+            </select>
+          </div>
+
+          {timetables.length > 1 && (
+            <div className="flex items-center gap-1.5 pl-2 border-l border-border/60">
+              <span className="text-xs text-muted-foreground">Schedule:</span>
               <select
-                value={selectedEntityId}
-                onChange={(e) => setSelectedEntityId(e.target.value)}
-                className="h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                value={currentTimetable?.id || ''}
+                onChange={(e) => {
+                  setSelectedTimetableId(e.target.value);
+                  loadTimetableDetails(e.target.value);
+                }}
+                className="h-8 rounded-md border border-input bg-background px-2.5 py-0 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               >
-                {viewMode === 'DIVISION' && divisions.map(d => (
-                  <option key={d.id} value={d.id}>{d.name} ({d.department?.code || 'Dept'} - {d.studentCount} students)</option>
-                ))}
-
-                {viewMode === 'FACULTY' && facultyList.map(f => (
-                  <option key={f.id} value={f.id}>{f.name} ({f.department?.code})</option>
-                ))}
-
-                {viewMode === 'ROOM' && roomsList.map(r => (
-                  <option key={r.id} value={r.id}>{r.roomNumber} ({r.roomType} - Cap {r.capacity})</option>
+                {timetables.map(tt => (
+                  <option key={tt.id} value={tt.id}>{tt.name}</option>
                 ))}
               </select>
             </div>
+          )}
+        </div>
 
-            {timetables.length > 1 && (
-              <div className="flex items-center gap-2 pl-2 border-l border-border">
-                <span className="text-xs font-medium text-muted-foreground">Schedule:</span>
-                <select
-                  value={currentTimetable?.id || ''}
-                  onChange={(e) => {
-                    setSelectedTimetableId(e.target.value);
-                    loadTimetableDetails(e.target.value);
-                  }}
-                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  {timetables.map(tt => (
-                    <option key={tt.id} value={tt.id}>{tt.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-        </CardContent>
-      </Card>
+      </div>
 
       {/* Interactive Timetable Weekly Grid Card */}
-      <Card className="overflow-hidden shadow-sm">
+      <div className="rounded-lg border border-border/80 bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-border bg-muted/40">
-                <th className="p-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-28">Period</th>
+              <tr className="border-b border-border/80 bg-muted/30">
+                <th className="p-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider w-24">Period</th>
                 {DAYS.map(day => (
-                  <th key={day} className="p-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th key={day} className="p-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                     {day}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border/60">
               {periods.map(periodNum => {
                 const isAfterLunch = periodNum === 5;
 
                 return (
                   <React.Fragment key={periodNum}>
                     {isAfterLunch && (
-                      <tr className="bg-muted/30 border-y border-border">
-                        <td colSpan={6} className="py-2.5 px-4 text-center text-xs font-medium text-muted-foreground tracking-wider uppercase">
-                          ☕ Lunch & Recess Break (13:15 - 14:00)
+                      <tr className="bg-muted/20 border-y border-border/60">
+                        <td colSpan={6} className="py-1.5 px-4 text-center text-[11px] font-medium text-muted-foreground tracking-wider uppercase">
+                          Recess Break • 13:15 - 14:00
                         </td>
                       </tr>
                     )}
 
-                    <tr className="hover:bg-muted/20 transition-colors">
+                    <tr className="hover:bg-muted/10 transition-colors">
                       {/* Period Time Header */}
-                      <td className="p-3 bg-muted/10 border-r border-border align-top">
-                        <span className="font-bold text-sm text-foreground">P{periodNum}</span>
+                      <td className="p-2.5 bg-muted/5 border-r border-border/60 align-top">
+                        <span className="font-semibold text-xs text-foreground block">P{periodNum}</span>
                         <div className="text-[10px] text-muted-foreground mt-0.5">{periodTimes[periodNum]}</div>
                       </td>
 
@@ -413,9 +411,8 @@ export default function TimetablesView() {
 
                         if (!entry) {
                           return (
-                            <td key={day} className="p-2 border-r border-border/60 align-top">
-                              <div className="h-20 rounded-lg border border-dashed border-border/80 flex items-center justify-center text-[11px] text-muted-foreground/60 select-none">
-                                Available
+                            <td key={day} className="p-1.5 border-r border-border/40 align-top">
+                              <div className="h-[74px] rounded-md border border-transparent hover:border-dashed hover:border-border/60 transition-colors flex items-center justify-center text-[10px] text-muted-foreground/30">
                               </div>
                             </td>
                           );
@@ -425,38 +422,37 @@ export default function TimetablesView() {
                         const canEdit = currentUser && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'DEPARTMENT_ADMIN');
 
                         return (
-                          <td key={day} className="p-2 border-r border-border/60 align-top">
+                          <td key={day} className="p-1.5 border-r border-border/40 align-top">
                             <div
                               onClick={() => canEdit && openMoveModal(entry)}
-                              className={`group h-20 rounded-lg p-2.5 border transition-all flex flex-col justify-between ${
-                                canEdit ? 'cursor-pointer hover:border-primary hover:shadow-sm' : ''
+                              className={`group h-[74px] rounded-md p-2 border transition-all flex flex-col justify-between select-none ${
+                                canEdit ? 'cursor-pointer hover:border-primary/60 hover:shadow-xs' : ''
                               } ${
                                 isLab
-                                  ? 'bg-secondary/70 border-border'
-                                  : 'bg-card border-border'
+                                  ? 'bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-900/40 text-foreground'
+                                  : 'bg-card border-border/80 hover:border-border text-foreground'
                               }`}
                             >
-                              <div className="flex items-start justify-between gap-1">
-                                <span className="truncate font-semibold text-xs text-foreground">
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="truncate font-semibold text-xs text-foreground tracking-tight">
                                   {entry.subject.code}
                                 </span>
-                                <Badge 
-                                  variant={isLab ? 'purple' : 'secondary'}
-                                  className="text-[9px] px-1 py-0 h-4 font-normal"
-                                >
+                                <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${
+                                  isLab ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'bg-muted text-muted-foreground'
+                                }`}>
                                   {entry.subject.type}
-                                </Badge>
+                                </span>
                               </div>
 
-                              <div className="truncate text-[11px] text-muted-foreground font-medium" title={entry.subject.name}>
+                              <div className="truncate text-[11px] text-foreground/80 font-medium leading-tight" title={entry.subject.name}>
                                 {entry.subject.name}
                               </div>
 
-                              <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1 border-t border-border/60">
-                                <span className="truncate max-w-[90px]" title={entry.faculty.name}>
+                              <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1 border-t border-border/40">
+                                <span className="truncate max-w-[85px]" title={entry.faculty.name}>
                                   {entry.faculty.name.replace('Prof. ', '')}
                                 </span>
-                                <span className="font-medium text-foreground">
+                                <span className="font-mono text-foreground/90 font-medium">
                                   {entry.room.roomNumber}
                                 </span>
                               </div>
@@ -471,7 +467,7 @@ export default function TimetablesView() {
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* Manual Slot Mover / Reassign Modal using Shadcn Dialog */}
       <Dialog open={!!movingEntry} onOpenChange={(open) => !open && setMovingEntry(null)}>

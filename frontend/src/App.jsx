@@ -32,13 +32,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+    <div className="min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-primary/15 selection:text-primary">
       <Navbar />
       
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full max-w-[1560px] mx-auto">
         <Sidebar />
         
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-y-auto">
+        <main className="flex-1 p-5 sm:p-7 lg:p-9 min-w-0 overflow-y-auto">
           {renderActivePage()}
         </main>
       </div>

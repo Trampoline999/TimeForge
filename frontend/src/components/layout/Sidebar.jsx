@@ -6,129 +6,119 @@ import {
   Sparkles, 
   AlertTriangle, 
   Clock, 
-  Layers, 
-  School,
   Building2
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 
 export default function Sidebar() {
   const { activeTab, setActiveTab, currentUser } = useAppStore();
 
-  const navItems = [
+  const mainNavItems = [
     {
       id: 'dashboard',
-      label: 'College Overview',
+      label: 'Overview',
       icon: LayoutDashboard,
-      description: 'Key metrics & schedules',
     },
     {
       id: 'timetables',
       label: 'Timetable Matrix',
       icon: CalendarDays,
-      description: 'Division, Faculty & Room grids',
     },
     {
       id: 'generator',
-      label: 'AI Generator',
+      label: 'Generator',
       icon: Sparkles,
-      description: 'Automated constraint solver',
-      highlight: true,
+      badge: 'Auto',
       roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'],
     },
     {
       id: 'conflicts',
-      label: 'Conflict Center',
+      label: 'Conflict Audit',
       icon: AlertTriangle,
-      description: 'Hard & soft issue analysis',
-    },
-    {
-      id: 'resources',
-      label: 'Academic Resources',
-      icon: Building2,
-      description: 'Faculty, Rooms, Subjects & Divs',
-    },
-    {
-      id: 'availability',
-      label: 'Availability Grid',
-      icon: Clock,
-      description: 'Faculty & Division periods',
     },
   ];
 
+  const resourceNavItems = [
+    {
+      id: 'resources',
+      label: 'Academic Data',
+      icon: Building2,
+    },
+    {
+      id: 'availability',
+      label: 'Availability',
+      icon: Clock,
+    },
+  ];
+
+  const renderNavList = (items) => (
+    <nav className="space-y-0.5">
+      {items.map((item) => {
+        if (item.roles && currentUser && !item.roles.includes(currentUser.role)) {
+          return null;
+        }
+
+        const Icon = item.icon;
+        const isActive = activeTab === item.id;
+
+        return (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`group w-full flex items-center justify-between rounded-md px-3 py-2 text-left text-xs font-medium transition-all cursor-pointer ${
+              isActive
+                ? 'bg-primary/10 text-primary font-semibold'
+                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
+              <span className="truncate">{item.label}</span>
+            </div>
+            {item.badge && (
+              <Badge variant="outline" className={`text-[10px] h-4 px-1.5 py-0 font-normal border-0 ${
+                isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
+              }`}>
+                {item.badge}
+              </Badge>
+            )}
+          </button>
+        );
+      })}
+    </nav>
+  );
+
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-card/30 p-4 hidden md:flex md:flex-col justify-between min-h-[calc(100vh-4rem)]">
-      <div className="space-y-6">
+    <aside className="w-56 shrink-0 border-r border-border/80 bg-background/50 p-3.5 hidden md:flex md:flex-col justify-between min-h-[calc(100vh-3.5rem)] select-none">
+      <div className="space-y-5">
         <div>
-          <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Navigation
+          <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+            Workspace
           </p>
-          <nav className="mt-2 space-y-1">
-            {navItems.map((item) => {
-              if (item.roles && currentUser && !item.roles.includes(currentUser.role)) {
-                return null;
-              }
-
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`group w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground font-medium shadow-sm'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'}`} />
-                  <div className="overflow-hidden">
-                    <div className="truncate font-medium">{item.label}</div>
-                    <div className={`truncate text-[11px] ${isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                      {item.description}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </nav>
+          {renderNavList(mainNavItems)}
         </div>
 
-        <Separator />
-
-        {/* Academic Session Card */}
-        <Card className="bg-card/60 border-border shadow-none">
-          <CardHeader className="p-3.5 pb-2">
-            <div className="flex items-center gap-2">
-              <School className="h-4 w-4 text-primary" />
-              <CardTitle className="text-xs font-semibold">Academic Session</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="p-3.5 pt-0 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-foreground">2026-27</span>
-              <Badge variant="success" className="text-[10px] px-1.5 py-0">ACTIVE</Badge>
-            </div>
-            <p className="text-[11px] text-muted-foreground">Odd Semesters (1, 3, 5, 7)</p>
-          </CardContent>
-        </Card>
+        <div>
+          <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+            Resources
+          </p>
+          {renderNavList(resourceNavItems)}
+        </div>
       </div>
 
-      {/* Shared Resource Status */}
-      <Card className="bg-muted/40 border-border/80 shadow-none">
-        <CardContent className="p-3.5">
-          <div className="flex items-center gap-2 text-primary font-medium text-xs">
-            <Layers className="h-3.5 w-3.5" />
-            <span>Shared Synchronized Engine</span>
+      {/* Minimal Session Status Pill */}
+      <div className="pt-4 border-t border-border/60">
+        <div className="flex items-center justify-between px-2 py-1.5 rounded-md bg-muted/40 text-[11px]">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-medium text-foreground">2026-27</span>
           </div>
-          <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-            Faculty & Lab availability is synchronized across all engineering branches.
-          </p>
-        </CardContent>
-      </Card>
+          <span className="text-[10px] text-muted-foreground">Odd Sem</span>
+        </div>
+      </div>
     </aside>
   );
 }

@@ -95,107 +95,142 @@ export default function AcademicResources() {
     }
   };
 
+  // Search / Filter
+  const [searchQuery, setSearchQuery] = useState('');
+
   if (loading) {
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm text-muted-foreground">Loading academic resources...</span>
+          <span className="text-sm text-muted-foreground">Loading academic data...</span>
         </div>
       </div>
     );
   }
 
+  const filteredFaculty = faculty.filter(f => 
+    !searchQuery || 
+    f.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    f.employeeCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    f.department?.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredSubjects = subjects.filter(s =>
+    !searchQuery ||
+    s.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.department?.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredRooms = rooms.filter(r =>
+    !searchQuery ||
+    r.roomNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.roomType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (r.building && r.building.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       
-      {/* Title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          College Academic Resources
-        </h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          Manage departments, student divisions, faculty teaching qualifications, subjects, and laboratory spaces.
-        </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/60">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Academic Resources
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Faculty teaching authorizations, subject loads, and room capacities.
+          </p>
+        </div>
+
+        {/* Minimal Search Input */}
+        <div className="w-full sm:w-64">
+          <input
+            type="text"
+            placeholder="Quick search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-8 px-3 rounded-md border border-input bg-background text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
       </div>
 
       {/* Tabs */}
       <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="space-y-4">
-        <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full sm:w-auto">
-          <TabsTrigger value="faculty" className="gap-2 text-xs">
+        <TabsList className="h-8 p-0.5 bg-muted/60">
+          <TabsTrigger value="faculty" className="h-7 text-xs px-3 gap-1.5">
             <GraduationCap className="h-3.5 w-3.5" />
             <span>Faculty ({faculty.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="subjects" className="gap-2 text-xs">
+          <TabsTrigger value="subjects" className="h-7 text-xs px-3 gap-1.5">
             <BookOpen className="h-3.5 w-3.5" />
             <span>Subjects ({subjects.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="rooms" className="gap-2 text-xs">
+          <TabsTrigger value="rooms" className="h-7 text-xs px-3 gap-1.5">
             <DoorOpen className="h-3.5 w-3.5" />
-            <span>Rooms & Labs ({rooms.length})</span>
+            <span>Rooms ({rooms.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="departments" className="gap-2 text-xs">
+          <TabsTrigger value="departments" className="h-7 text-xs px-3 gap-1.5">
             <Building2 className="h-3.5 w-3.5" />
-            <span>Departments ({departments.length})</span>
+            <span>Depts ({departments.length})</span>
           </TabsTrigger>
         </TabsList>
 
         {/* TAB 1: FACULTY */}
         <TabsContent value="faculty" className="space-y-4 pt-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {faculty.map((f) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {filteredFaculty.map((f) => {
               const isShared = f.name.includes('Shared');
               return (
-                <Card key={f.id} className="flex flex-col justify-between">
-                  <CardHeader className="pb-3">
+                <div key={f.id} className="rounded-lg border border-border/80 bg-card p-4 flex flex-col justify-between hover:border-border transition-colors">
+                  <div className="space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <CardTitle className="text-sm font-semibold">{f.name}</CardTitle>
+                          <span className="font-semibold text-xs text-foreground">{f.name}</span>
                           {isShared && (
-                            <Badge variant="purple" className="text-[9px] px-1.5 py-0 h-4">
+                            <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                               SHARED
-                            </Badge>
+                            </span>
                           )}
                         </div>
-                        <CardDescription className="text-xs mt-0.5">
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           {f.designation} • {f.department?.code}
-                        </CardDescription>
+                        </p>
                       </div>
                       <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                         {f.employeeCode}
                       </span>
                     </div>
-                  </CardHeader>
 
-                  <CardContent className="space-y-3 pt-0">
-                    <div className="space-y-1.5 pt-2 border-t border-border">
-                      <span className="text-[11px] font-medium text-muted-foreground block">Authorized Subjects:</span>
+                    <div className="space-y-1 pt-2 border-t border-border/60">
+                      <span className="text-[11px] text-muted-foreground block">Authorized:</span>
                       <div className="flex flex-wrap gap-1">
                         {(f.facultySubjects || []).length === 0 ? (
-                          <span className="text-xs text-destructive italic">No subjects authorized yet</span>
+                          <span className="text-[11px] text-amber-500/80 italic">No subjects assigned</span>
                         ) : (
                           f.facultySubjects.map(fs => (
-                            <Badge key={fs.id} variant="secondary" className="text-[10px] font-normal">
+                            <span key={fs.id} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-foreground/80 font-mono">
                               {fs.subject?.code}
-                            </Badge>
+                            </span>
                           ))
                         )}
                       </div>
                     </div>
+                  </div>
 
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openFacultySubjectModal(f)}
-                        className="text-xs h-8"
-                      >
-                        Authorize Subjects
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <div className="pt-3 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openFacultySubjectModal(f)}
+                      className="text-xs h-7 text-primary hover:bg-primary/10"
+                    >
+                      Authorize
+                    </Button>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -203,23 +238,23 @@ export default function AcademicResources() {
 
         {/* TAB 2: SUBJECTS */}
         <TabsContent value="subjects" className="pt-1">
-          <Card>
+          <div className="rounded-lg border border-border/80 bg-card overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Subject Name</TableHead>
-                  <TableHead>Dept / Sem</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Sessions/Wk</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Facility</TableHead>
+                <TableRow className="bg-muted/30">
+                  <TableHead className="text-xs">Code</TableHead>
+                  <TableHead className="text-xs">Subject Name</TableHead>
+                  <TableHead className="text-xs">Dept / Sem</TableHead>
+                  <TableHead className="text-xs">Type</TableHead>
+                  <TableHead className="text-xs">Sessions/Wk</TableHead>
+                  <TableHead className="text-xs">Duration</TableHead>
+                  <TableHead className="text-xs">Facility</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {subjects.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-mono font-semibold text-foreground text-xs">
+                {filteredSubjects.map((s) => (
+                  <TableRow key={s.id} className="hover:bg-muted/20">
+                    <TableCell className="font-mono font-medium text-foreground text-xs">
                       {s.code}
                     </TableCell>
                     <TableCell className="font-medium text-foreground text-xs">
@@ -229,14 +264,18 @@ export default function AcademicResources() {
                       {s.department?.code} • {s.semester?.name}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={s.type === 'LAB' ? 'purple' : 'secondary'} className="text-[10px]">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                        s.type === 'LAB' 
+                          ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' 
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
                         {s.type}
-                      </Badge>
+                      </span>
                     </TableCell>
-                    <TableCell className="text-foreground text-xs font-medium">
+                    <TableCell className="text-foreground text-xs">
                       {s.weeklySessions} sessions
                     </TableCell>
-                    <TableCell className="text-foreground text-xs font-medium">
+                    <TableCell className="text-foreground text-xs">
                       {s.duration} period{s.duration > 1 ? 's' : ''}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">
@@ -246,28 +285,28 @@ export default function AcademicResources() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </div>
         </TabsContent>
 
         {/* TAB 3: ROOMS */}
         <TabsContent value="rooms" className="pt-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {rooms.map((r) => (
-              <Card key={r.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold">{r.roomNumber}</CardTitle>
-                    <Badge variant={r.isShared ? 'purple' : 'outline'} className="text-[10px]">
-                      {r.isShared ? 'COLLEGE SHARED' : r.department?.code || 'DEPARTMENT'}
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-xs">{r.building}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2 border-t border-border flex items-center justify-between text-xs">
-                  <span className="font-medium text-foreground">{r.roomType}</span>
-                  <span className="text-muted-foreground font-medium">Capacity: {r.capacity}</span>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {filteredRooms.map((r) => (
+              <div key={r.id} className="rounded-lg border border-border/80 bg-card p-3.5 hover:border-border transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-foreground">{r.roomNumber}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                    r.isShared ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {r.isShared ? 'COLLEGE SHARED' : r.department?.code || 'DEPT'}
+                  </span>
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">{r.building}</div>
+                <div className="pt-2 mt-2 border-t border-border/60 flex items-center justify-between text-xs">
+                  <span className="text-foreground/80">{r.roomType}</span>
+                  <span className="text-muted-foreground text-[11px]">Cap: {r.capacity}</span>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>

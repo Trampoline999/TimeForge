@@ -173,82 +173,83 @@ export default function Generator() {
     <div className="max-w-4xl mx-auto space-y-6">
       
       {/* Title */}
-      <div className="space-y-1">
+      <div className="space-y-1 pb-2 border-b border-border/60">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Intelligent Timetable Generation Engine
+          <Sparkles className="h-4 w-4 text-primary" />
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Schedule Generator
           </h1>
         </div>
         <p className="text-xs text-muted-foreground">
-          Constraint solver with forward-checking for cross-department shared faculty, room capacities, and contiguous lab sessions.
+          Constraint solver for multi-department schedules, faculty loads, and contiguous lab blocks.
         </p>
       </div>
 
       {/* Main Configuration Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">Generation Parameters</CardTitle>
-          <CardDescription>
-            Configure academic scope and branches for multi-department schedule compilation.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleGenerate} className="space-y-6">
-            
-            {/* Timetable Name */}
-            <div className="space-y-2">
-              <Label htmlFor="timetableName">Schedule Title</Label>
-              <Input
-                id="timetableName"
-                type="text"
-                value={timetableName}
-                onChange={(e) => setTimetableName(e.target.value)}
-                placeholder="e.g. Odd Semester 2026-27 (CSE, IT, MECH)"
-                required
-              />
+      <div className="rounded-lg border border-border/80 bg-card p-5 sm:p-6 shadow-none space-y-6">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Parameters</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Select academic session and branches to solve collectively.
+          </p>
+        </div>
+        
+        <form onSubmit={handleGenerate} className="space-y-5">
+          
+          {/* Timetable Name */}
+          <div className="space-y-1.5">
+            <Label htmlFor="timetableName" className="text-xs font-medium">Schedule Title</Label>
+            <Input
+              id="timetableName"
+              type="text"
+              value={timetableName}
+              onChange={(e) => setTimetableName(e.target.value)}
+              placeholder="e.g. Odd Semester 2026-27"
+              className="h-9 text-xs"
+              required
+            />
+          </div>
+
+          {/* Academic Year and Semester */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="academicYear" className="text-xs font-medium">Academic Year</Label>
+              <select
+                id="academicYear"
+                value={selectedYearId}
+                onChange={(e) => setSelectedYearId(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                {academicYears.map(ay => (
+                  <option key={ay.id} value={ay.id}>{ay.name} ({ay.status})</option>
+                ))}
+              </select>
             </div>
 
-            {/* Academic Year and Semester */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="academicYear">Academic Year</Label>
-                <select
-                  id="academicYear"
-                  value={selectedYearId}
-                  onChange={(e) => setSelectedYearId(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  {academicYears.map(ay => (
-                    <option key={ay.id} value={ay.id}>{ay.name} ({ay.status})</option>
-                  ))}
-                </select>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="semester" className="text-xs font-medium">Target Semester</Label>
+                <span className="text-[11px] text-muted-foreground">
+                  {matchingDivisions.length} division{matchingDivisions.length !== 1 ? 's' : ''} found
+                </span>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="semester">Target Semester</Label>
-                  <span className="text-[11px] text-muted-foreground">
-                    {matchingDivisions.length} division{matchingDivisions.length !== 1 ? 's' : ''} found
-                  </span>
-                </div>
-                <select
-                  id="semester"
-                  value={selectedSemId}
-                  onChange={(e) => handleSemesterChange(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  {semesters.map(s => {
-                    const count = allDivisions.filter(d => d.semesterId === s.id).length;
-                    return (
-                      <option key={s.id} value={s.id}>
-                        {s.name} ({count > 0 ? `${count} active division${count > 1 ? 's' : ''}` : 'No divisions yet'})
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
+              <select
+                id="semester"
+                value={selectedSemId}
+                onChange={(e) => handleSemesterChange(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                {semesters.map(s => {
+                  const count = allDivisions.filter(d => d.semesterId === s.id).length;
+                  return (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({count > 0 ? `${count} active division${count > 1 ? 's' : ''}` : 'No divisions yet'})
+                    </option>
+                  );
+                })}
+              </select>
             </div>
+          </div>
 
             {/* Department Multi-Select (Cross-Department Sharing) */}
             <div className="space-y-3">
@@ -370,25 +371,24 @@ export default function Generator() {
             <Button
               type="submit"
               disabled={generating || matchingDivisions.length === 0}
-              className="w-full gap-2 shadow-sm font-semibold h-10"
+              className="w-full gap-2 shadow-none font-medium h-9 text-xs"
             >
               {generating ? (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  <span>Solving Constraints...</span>
+                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  <span>Compiling Schedule...</span>
                 </>
               ) : matchingDivisions.length === 0 ? (
                 <span>Select a Semester with Active Divisions</span>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4" />
-                  <span>Run Intelligent Schedule Generator</span>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>Compile Timetable</span>
                 </>
               )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+      </div>
 
       {/* Success Result Card */}
       {result && (

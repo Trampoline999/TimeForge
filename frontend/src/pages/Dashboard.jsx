@@ -72,273 +72,247 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       
-      {/* Hero Welcome Card */}
-      <Card className="border-border bg-gradient-to-r from-card to-secondary/30 shadow-sm overflow-hidden">
-        <CardContent className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5">
-              <Badge variant="outline" className="gap-1 border-primary/30 text-primary">
-                <Sparkles className="h-3 w-3" />
-                Constraint Satisfaction Engine Active
-              </Badge>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-              Engineering College Timetable Hub
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Overview
             </h1>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Automated conflict-free scheduling respecting faculty qualifications, shared laboratories, consecutive practical blocks, and room capacities across all college branches.
-            </p>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              Solver Ready
+            </span>
           </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Automated conflict-free scheduling and academic resource status.
+          </p>
+        </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Button
-              onClick={() => setActiveTab('generator')}
-              className="gap-2 shadow-sm font-medium"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Launch Generator</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setActiveTab('timetables')}
-              className="gap-2"
-            >
-              <span>View Grid</span>
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* College Resource Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Departments
-            </CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stats.departmentsCount || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">CSE, IT, AI&DS, MECH</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Divisions
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stats.divisionsCount || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">Semester 1 through 8</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Faculty Members
-            </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stats.facultyCount || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">Professors & Instructors</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Rooms & Labs
-            </CardTitle>
-            <DoorOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stats.roomsCount || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">Lecture Halls & Shared Labs</p>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveTab('timetables')}
+            className="h-8 text-xs font-medium gap-1.5 shadow-none"
+          >
+            <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>View Matrix</span>
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setActiveTab('generator')}
+            className="h-8 text-xs font-medium gap-1.5 shadow-none"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Generate Schedule</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Main Grid: Recent Timetables & Engine Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Clean Stat Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="rounded-lg border border-border/80 bg-card p-4 hover:border-border transition-colors">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Departments</span>
+            <Building2 className="h-4 w-4 stroke-[1.75]" />
+          </div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            {stats.departmentsCount || 0}
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">
+            CSE, IT, AI&DS, MECH
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-border/80 bg-card p-4 hover:border-border transition-colors">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Student Divisions</span>
+            <Users className="h-4 w-4 stroke-[1.75]" />
+          </div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            {stats.divisionsCount || 0}
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">
+            Active class sections
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-border/80 bg-card p-4 hover:border-border transition-colors">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Faculty Members</span>
+            <BookOpen className="h-4 w-4 stroke-[1.75]" />
+          </div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            {stats.facultyCount || 0}
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">
+            With subject qualifications
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-border/80 bg-card p-4 hover:border-border transition-colors">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Rooms & Labs</span>
+            <DoorOpen className="h-4 w-4 stroke-[1.75]" />
+          </div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            {stats.roomsCount || 0}
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">
+            Classrooms & practical labs
+          </div>
+        </div>
+      </div>
+
+      {/* Main Grid: Recent Timetables & Engine Health */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
-        {/* Recent Timetables Card */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
+        {/* Recent Timetables Table */}
+        <Card className="lg:col-span-2 shadow-none border-border/80">
+          <CardHeader className="p-4 pb-3 flex flex-row items-center justify-between space-y-0">
             <div>
-              <CardTitle className="text-base font-semibold">Active & Generated Schedules</CardTitle>
-              <CardDescription>Recently generated multi-department timetables</CardDescription>
+              <CardTitle className="text-sm font-semibold">Generated Schedules</CardTitle>
+              <CardDescription className="text-xs mt-0.5">Recently compiled college timetables</CardDescription>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setActiveTab('timetables')}
-              className="gap-1 text-xs"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
             >
-              <span>View All</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <span>All Schedules</span>
+              <ArrowRight className="h-3 w-3" />
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {recentTimetables.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground text-sm">
-                No timetables generated yet. Click "Launch Generator" to create your first schedule.
+              <div className="py-12 text-center text-muted-foreground text-xs">
+                No schedules compiled yet. Click "Generate Schedule" to create one.
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Schedule Name</TableHead>
-                    <TableHead>Academic Year</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Sessions</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTimetables.map((tt) => (
-                    <TableRow key={tt.id}>
-                      <TableCell className="font-medium text-foreground">
-                        {tt.name}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-xs">
-                        {tt.academicYear?.name || '2026-27'}
-                      </TableCell>
-                      <TableCell>
+              <div className="divide-y divide-border/60">
+                {recentTimetables.map((tt) => (
+                  <div key={tt.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                    <div className="space-y-1 min-w-0 pr-4">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-xs text-foreground truncate">{tt.name}</span>
                         <Badge
-                          variant={
+                          variant="secondary"
+                          className={`text-[10px] h-4.5 px-1.5 font-normal border-0 ${
                             tt.status === 'PUBLISHED'
-                              ? 'success'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                               : tt.status === 'ARCHIVED'
-                              ? 'secondary'
-                              : 'info'
-                          }
-                          className="font-medium"
+                              ? 'bg-muted text-muted-foreground'
+                              : 'bg-primary/10 text-primary'
+                          }`}
                         >
                           {tt.status}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-xs">
-                        {tt._count?.entries || 0} slots
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedTimetableId(tt.id);
-                            setActiveTab('timetables');
-                          }}
-                          className="h-8 px-2 text-xs"
-                        >
-                          Open Matrix
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        {tt.academicYear?.name || '2026-27'} • {tt._count?.entries || 0} scheduled sessions
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedTimetableId(tt.id);
+                        setActiveTab('timetables');
+                      }}
+                      className="h-8 px-2.5 text-xs text-primary hover:bg-primary/10 shrink-0"
+                    >
+                      Open Grid
+                    </Button>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Engine Status & Quick Metrics Card */}
-        <Card>
-          <CardHeader>
+        {/* Engine Heuristics & Conflict Summary */}
+        <Card className="shadow-none border-border/80">
+          <CardHeader className="p-4 pb-3">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              <CardTitle className="text-base font-semibold">Constraint Validation</CardTitle>
+              <CardTitle className="text-sm font-semibold">Scheduler Guardrails</CardTitle>
             </div>
-            <CardDescription>Engine heuristics and live safety rules</CardDescription>
+            <CardDescription className="text-xs">Continuous constraint enforcement</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">Faculty Collision Guard</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Zero faculty overlapping across simultaneous periods.
-                </p>
+          <CardContent className="p-4 pt-1 space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-border/50 text-xs">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-foreground">Faculty Overlap Guard</span>
               </div>
+              <span className="text-[10px] text-muted-foreground">Zero Clash</span>
             </div>
 
-            <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">Room Capacity & Type Matching</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Practicals strictly routed to Computer / Hardware Labs.
-                </p>
+            <div className="flex items-center justify-between py-2 border-b border-border/50 text-xs">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-foreground">Lab & Room Capacities</span>
               </div>
+              <span className="text-[10px] text-muted-foreground">Matched</span>
             </div>
 
-            <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">Consecutive Lab Blocks</p>
-                <p className="text-[11px] text-muted-foreground">
-                  2-hour contiguous blocks preserved around lunch breaks.
-                </p>
+            <div className="flex items-center justify-between py-2 border-b border-border/50 text-xs">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-foreground">Consecutive Practical Blocks</span>
               </div>
+              <span className="text-[10px] text-muted-foreground">Contiguous</span>
             </div>
 
-            <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">Shared Mathematics Faculty</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Synchronized across CSE, IT & MECH departments.
-                </p>
+            <div className="flex items-center justify-between py-2 text-xs">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-foreground">Cross-Dept Shared Faculty</span>
               </div>
+              <span className="text-[10px] text-muted-foreground">Synced</span>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveTab('conflicts')}
+                className="w-full h-8 text-xs font-normal text-muted-foreground hover:text-foreground"
+              >
+                Run Conflict Audit
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* System Audit Logs */}
+      {/* System Audit Activity */}
       {recentAuditLogs.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Recent System Activity</CardTitle>
-            <CardDescription>Audit trail of generation runs, publishes, and overrides</CardDescription>
+        <Card className="shadow-none border-border/80">
+          <CardHeader className="p-4 pb-2">
+            <CardTitle className="text-sm font-semibold">Recent Activity</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Details</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead className="text-right">Timestamp</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentAuditLogs.slice(0, 5).map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs font-mono font-normal">
-                        {log.action}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-md truncate">
-                      {log.details ? (typeof log.details === 'object' ? JSON.stringify(log.details) : log.details) : '-'}
-                    </TableCell>
-                    <TableCell className="text-xs font-medium text-foreground">
-                      {log.user?.name || 'System Engine'}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground text-right">
-                      {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <CardContent className="p-0">
+            <div className="divide-y divide-border/60">
+              {recentAuditLogs.slice(0, 4).map((log) => (
+                <div key={log.id} className="px-4 py-2.5 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2.5 min-w-0 pr-4">
+                    <span className="font-mono text-[10px] uppercase text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                      {log.action}
+                    </span>
+                    <span className="text-foreground truncate">
+                      {log.details ? (typeof log.details === 'object' ? (log.details.name || JSON.stringify(log.details)) : log.details) : 'Action executed'}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground shrink-0">
+                    {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
